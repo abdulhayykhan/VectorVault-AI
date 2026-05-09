@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VectorVault-AI — Local semantic document search engine powered by Sentence-Transformers and ChromaDB.">
+  <title>VectorVault-AI — Neural Document Search</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="app-wrapper">
+    <!-- ───── Header ───── -->
+    <header class="header">
+      <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark theme">
+        <span class="theme-toggle__icon" id="theme-icon">🌙</span>
+      </button>
+      <div class="header__logo">
+        <div class="header__icon">🔮</div>
+        <h1 class="header__title">VectorVault</h1>
+      </div>
+      <p class="header__sub">Neural-powered semantic document search engine</p>
+    </header>
+
+    <!-- ───── Stats Bar ───── -->
+    <div class="stats-bar">
+      <div class="stat-pill">
+        <span class="stat-pill__dot"></span>
+        <span>Engine</span>
+        <span class="stat-pill__value">Online</span>
+      </div>
+      <div class="stat-pill">
+        <span>📄</span>
+        <span>Documents</span>
+        <span class="stat-pill__value" id="stat-docs">0</span>
+      </div>
+      <div class="stat-pill">
+        <span>🧬</span>
+        <span>Vectors</span>
+        <span class="stat-pill__value" id="stat-vectors">0</span>
+      </div>
+      <div class="stat-pill">
+        <span>🧠</span>
+        <span>Model</span>
+        <span class="stat-pill__value">MiniLM-L6</span>
+      </div>
+    </div>
+
+    <!-- ───── Two-Column Grid ───── -->
+    <div class="grid">
+      <!-- Upload Card -->
+      <div class="card">
+        <div class="card__header">
+          <div class="card__icon card__icon--upload">📁</div>
+          <div>
+            <div class="card__title">Document Vault</div>
+            <div class="card__label">PDF Ingestion Pipeline</div>
+          </div>
+        </div>
+
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-zone__icon">⬆️</div>
+          <div class="upload-zone__text">
+            Drop PDFs here or <strong>click to browse</strong>
+          </div>
+          <div class="upload-zone__hint">Supports multiple .pdf files — text is extracted, chunked &amp; vectorized</div>
+          <input type="file" id="file-input" accept=".pdf" multiple>
+        </div>
+
+        <div class="upload-progress" id="upload-progress">
+          <div class="progress-bar">
+            <div class="progress-bar__fill" id="progress-fill"></div>
+          </div>
+          <div class="upload-status" id="upload-status">Initializing...</div>
+        </div>
+
+        <div class="file-list" id="file-list"></div>
+      </div>
+
+      <!-- Search Card -->
+      <div class="card">
+        <div class="card__header">
+          <div class="card__icon card__icon--search">🔍</div>
+          <div>
+            <div class="card__title">Neural Search</div>
+            <div class="card__label">Semantic similarity via cosine distance</div>
+          </div>
+        </div>
+
+        <div class="search-wrapper">
+          <span class="search-icon">🧠</span>
+          <input
+            type="text"
+            class="search-input"
+            id="search-input"
+            placeholder="Ask anything about your documents..."
+            autocomplete="off"
+          >
+          <button class="search-btn" id="search-btn" title="Search">➜</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── Results ───── -->
+    <div class="card">
+      <div class="card__header">
+        <div class="card__icon card__icon--results">✨</div>
+        <div>
+          <div class="card__title">Search Results</div>
+          <div class="card__label" id="results-label">Awaiting query</div>
+        </div>
+      </div>
+
+      <div class="loading-spinner" id="loading-spinner">
+        <div class="loading-spinner__dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="results-feed" id="results-feed">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-state__icon">🌌</div>
+          <div class="empty-state__text">Upload documents &amp; search to see neural matches here</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── Knowledge Map ───── -->
+    <div class="card" style="margin-top: 1.5rem;">
+      <div class="card__header">
+        <div class="card__icon card__icon--map">🗺️</div>
+        <div>
+          <div class="card__title">Knowledge Map</div>
+          <div class="card__label" id="map-label">2D PCA projection of document vectors</div>
+        </div>
+        <button class="map-refresh-btn" id="map-refresh-btn" title="Refresh map">⟳</button>
+      </div>
+
+      <div class="map-container" id="map-container">
+        <canvas id="knowledge-map-canvas"></canvas>
+        <div class="map-tooltip" id="map-tooltip"></div>
+      </div>
+
+      <div class="map-empty" id="map-empty">
+        <div class="empty-state__icon">🌐</div>
+        <div class="empty-state__text">Upload at least 2 documents to generate the Knowledge Map</div>
+      </div>
+
+      <div class="loading-spinner" id="map-loading">
+        <div class="loading-spinner__dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
