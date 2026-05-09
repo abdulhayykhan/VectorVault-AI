@@ -1,4 +1,4 @@
-# VectorVault-AI 🛡️
+# VectorVault-AI
 
 **VectorVault-AI** is a local-first semantic research and document exploration engine. Built for the **Artificial Intelligence** course in my **4th semester of BS Artificial Intelligence (DUET)**, it moves beyond traditional keyword searching to provide a "Neural Search" experience. It utilizes high-dimensional vector embeddings to understand the context and meaning of academic documents, offering advanced features like semantic clustering and automated knowledge mapping.
 
