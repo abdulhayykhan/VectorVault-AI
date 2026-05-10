@@ -103,10 +103,29 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Fetch Vault Stats ─────────────────────────────────────────────────────
   async function refreshStats() {
     try {
-      const res  = await fetch('/stats');
-      const data = await res.json();
-      statVectors.textContent = data.total_chunks.toLocaleString();
-      statDocs.textContent    = uploadedFiles.length;
+      const [statsRes, sourcesRes] = await Promise.all([
+        fetch('/stats'),
+        fetch('/sources'),
+      ]);
+      const stats   = await statsRes.json();
+      const sources = await sourcesRes.json();
+
+      // Update vector count from ChromaDB
+      statVectors.textContent = stats.total_chunks.toLocaleString();
+
+      // Update doc count from persistent source list
+      statDocs.textContent = sources.total_docs;
+
+      // Rebuild uploadedFiles from backend so file-list survives refresh
+      // Merge: keep any session-uploaded entries, add any from DB not yet tracked
+      const trackedNames = new Set(uploadedFiles.map(f => f.name));
+      for (const src of sources.sources) {
+        if (!trackedNames.has(src.name)) {
+          uploadedFiles.push({ name: src.name, chunks: src.chunks, chars: 0 });
+        }
+      }
+
+      renderFileList();
     } catch {
       // silent fail on stats
     }

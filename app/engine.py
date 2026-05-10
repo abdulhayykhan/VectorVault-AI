@@ -173,6 +173,32 @@ def get_vault_stats() -> dict:
     return {"total_chunks": count, "collection": COLLECTION_NAME}
 
 
+def get_unique_sources() -> list[dict]:
+    """
+    Query ChromaDB for all stored metadata and return a deduplicated
+    list of source documents with their chunk counts.
+    Survives page refreshes / cold starts since it reads from persistent storage.
+    """
+    collection = get_collection()
+    count = collection.count()
+    if count == 0:
+        return []
+
+    all_data = collection.get(include=["metadatas"])
+    metadatas = all_data["metadatas"]
+
+    # Count chunks per source file
+    source_counts: dict[str, int] = {}
+    for meta in metadatas:
+        src = meta.get("source", "unknown")
+        source_counts[src] = source_counts.get(src, 0) + 1
+
+    return [
+        {"name": name, "chunks": chunks}
+        for name, chunks in sorted(source_counts.items())
+    ]
+
+
 def get_visualization_data() -> list[dict]:
     """
     Retrieve all stored embeddings, reduce them to 2D via PCA,

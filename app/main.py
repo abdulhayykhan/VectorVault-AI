@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from engine import ingest_pdf, semantic_search, get_vault_stats, get_visualization_data, UPLOAD_DIR
+from engine import ingest_pdf, semantic_search, get_vault_stats, get_unique_sources, get_visualization_data, UPLOAD_DIR
 
 app = FastAPI(title="VectorVault-AI", version="1.0.0")
 
@@ -81,6 +81,13 @@ async def query_vault(body: QueryRequest):
 @app.get("/stats", response_model=VaultStats)
 async def vault_stats():
     return get_vault_stats()
+
+
+@app.get("/sources")
+async def list_sources():
+    """Return unique source documents persisted in ChromaDB."""
+    sources = get_unique_sources()
+    return {"sources": sources, "total_docs": len(sources)}
 
 
 @app.get("/visualize")
